@@ -5,6 +5,7 @@
  */
 package MessApp;
 
+import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,15 +25,20 @@ import javax.swing.table.JTableHeader;
  *
  * @author Anshuman-HP
  */
-public class ListFrame extends javax.swing.JFrame {
+public class ListFrame extends javax.swing.JFrame  {
 
     /**
      * Creates new form ListFrame
+     * 
+     * 
      */
+    int numOfVeg=0;
+    int numOfNonVegPlate=0;
+    String message;
     public ListFrame() {
         initComponents();
+        
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -48,6 +54,7 @@ public class ListFrame extends javax.swing.JFrame {
         listTable = new javax.swing.JTable();
         getList = new javax.swing.JButton();
         Print = new javax.swing.JButton();
+        InfoMessage = new javax.swing.JLabel();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -64,18 +71,25 @@ public class ListFrame extends javax.swing.JFrame {
 
         listTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Name", "Mobile Number", "Address", "Amount", "Veg/Non-Veg"
+                "SlNo.", "Name", "Mobile Number", "Address", "Amount", "Remarks"
             }
         ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+            Class[] types = new Class [] {
+                java.lang.Long.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -109,7 +123,9 @@ public class ListFrame extends javax.swing.JFrame {
                 .addGap(86, 86, 86))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 596, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(InfoMessage)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 596, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -118,8 +134,11 @@ public class ListFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(getList)
                     .addComponent(Print))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(InfoMessage)
+                .addGap(47, 47, 47))
         );
 
         pack();
@@ -129,30 +148,37 @@ public class ListFrame extends javax.swing.JFrame {
         try {
             // TODO add your handling code here:
             // TODO add header and footer
-            listTable.print();
+            //listTable.print();
+            MessageFormat format=new MessageFormat(InfoMessage.getText());
+            listTable.print(JTable.PrintMode.FIT_WIDTH,format,null);
         } catch (PrinterException ex) {
             Logger.getLogger(ListFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_PrintActionPerformed
 
     private void getListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getListActionPerformed
-                                               
-              
+
                 // TODO add your handling code here:
+                numOfNonVegPlate=0;
+                numOfVeg=0;
+                String date;
                 String[] dayChoices = { "Today", "Tommorow" };
                 String dayInput = (String) JOptionPane.showInputDialog(null, "Choose ","For", JOptionPane.QUESTION_MESSAGE, null,dayChoices,dayChoices[1]);
                 System.out.println(dayInput);
-                java.sql.Date dateInput;
+                java.sql.Timestamp dateInput;
                 if(dayInput.equals("Today")){
-                    DateFormat format=new SimpleDateFormat("dd-MM-yyyy");
                     Calendar cal=Calendar.getInstance();
-                    dateInput=new java.sql.Date(cal.getTime().getTime());
+                    dateInput=new java.sql.Timestamp(cal.getTime().getTime());
+                    date = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(dateInput);
+
+                   
                 }
                 else {
-                    DateFormat format=new SimpleDateFormat("dd-MM-yyyy");
                     Calendar cal=Calendar.getInstance();
                     cal.add(Calendar.DAY_OF_YEAR, 1);
-                    dateInput=new java.sql.Date(cal.getTime().getTime());
+                    dateInput=new java.sql.Timestamp(cal.getTime().getTime());
+                    date = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(dateInput);
+
                 }
                 
                 
@@ -162,67 +188,108 @@ public class ListFrame extends javax.swing.JFrame {
                 System.out.println(dateInput);
                 
                 try {
-                    String condition1="customerdetails.name=name";
-                    String conditon2="customerdetails.address=address";
-                    String condtion3="NOT "+mealInput;
-                    String condition34=mealInput+" AND (fromdate < #"+dateInput+"# < todate)";
-                    String condition4=mealInput+" AND (#"+dateInput+"#  BETWEEN fromdate  AND todate )";
-                    String query="select * from customerdetails cancel  where "+mealInput+" AND name IN(select name from cancel where NOT "+mealInput+" OR ("+mealInput+" AND (('"+dateInput+"'BETWEEN fromdate AND todate) OR fromdate IS NULL OR todate IS NULL)) )";
-                    String query1="select * from customerdetails where ("+mealInput+" AND (EXISTS(select name,address from cancel where ((customerdetails.name=cancel.name) AND (customerdetails.address=cancel.address) AND ((NOT "+mealInput+"))))))";
-                    String query2="select * from customerdetails where ("+mealInput+") AND (EXISTS(select name,address from cancel where ("+conditon2+") AND ("+condition1+") AND (("+condtion3+") OR ( NOT "+condition4+"))))";
-                    //
-                    String condtion31="NOT cancel."+mealInput;
-                    String condition41="cancel."+mealInput+" AND (#"+dateInput+"#  BETWEEN cancel.fromdate  AND cancel.todate )";
-
-                    String query5="select * from customerdetails where ("+mealInput+") AND (EXISTS(select name,address from cancel where ("+conditon2+") AND ("+condition1+") AND (("+condtion3+") OR (  "+condition4+"))))";
-
-                    String query3="select fromdate,todate from cancel";
-                    
-                    String queryJoin="select * from customerdetails LEFT JOIN cancel ON (customerdetails.name = cancel.name AND customerdetails.address=cancel.address) where ("+mealInput+" AND (("+condtion31+") OR ("+condition41+")) )";
-                    ResultSet listSet3=MainFrame.DBconn.createStatement().executeQuery(query3);
-                    
-                    while(listSet3.next()){
-                        System.out.println(listSet3.getDate("fromdate").getClass().getName());
-                        System.out.println(listSet3.getDate("todate").getClass().getName());
-
-                    }
-                    
                     String finalQuery="SELECT * from customerdetails LEFT JOIN cancel "+
                             " ON (customerdetails.name=cancel.name AND customerdetails.address=cancel.address) "+
-                            " WHERE ((customerdetails."+mealInput+
+                            " WHERE (((customerdetails."+mealInput+
                             " AND (cancel.name IS NULL)) "+
-                            " OR((customerdetails."+mealInput+
+                            " OR(((customerdetails."+mealInput+" AND (NOT (cancel.stop) AND NOT(cancel.restart)))"+
                             " AND ((NOT cancel."+mealInput+
-                            " )OR(cancel."+mealInput+
-                            " AND NOT (#"+dateInput+"#"+
-                            " between (cancel.fromdate-1) AND cancel.todate))))))";
-
-                    //OR ("+mealInput+" AND (('"+dateInput+"'BETWEEN fromdate AND todate) OR fromdate IS NULL OR todate IS NULL))))))";
+                            " )OR((cancel."+mealInput+")"+
+                            " AND NOT (#"+date+"#"+
+                            " between (cancel.fromdate) AND (cancel.todate))))))))"+
+                            " order by SerialNumber";
+                            
+                   
+                    System.out.println(finalQuery);
                     ResultSet listSet=MainFrame.DBconn.createStatement().executeQuery(finalQuery);
                     DefaultTableModel model = (DefaultTableModel) listTable.getModel();
                     model.setNumRows(0);
                     System.out.println(finalQuery);
+                    int n=1;
                     while(listSet.next()){
                         Vector row = new Vector();
+                        System.out.println(listSet.getString("name"));
+                        row.add(n);
                         row.add(listSet.getString("name"));
                         row.add(listSet.getLong("mobilenumber"));
                         row.add(listSet.getString("address"));
                         row.add(listSet.getInt("Amount"));
-                        row.add(listSet.getString("Veg_NonVeg"));
+                        row.add(listSet.getString("Remarks"));
+                        if(listSet.getBoolean("Veg")){
+                            numOfVeg++;
+                        }else{
+                            if(listSet.getBoolean("Full")){
+                                numOfNonVegPlate=numOfNonVegPlate+2;
+                            }
+                            else{
+                                numOfNonVegPlate++;
+                            }
+                        }
                         model.addRow(row);
+                        n++;
+                    }
+                    
+                    String stopQuery="SELECT * from customerdetails LEFT JOIN cancel ON (customerdetails.name=cancel.name AND customerdetails.address=cancel.address) WHERE(((cancel.stop AND NOT(cancel.restart)) AND customerdetails."+mealInput+") AND ((NOT cancel."+mealInput+") AND (#"+date+"# <= cancel.fromdate)))";
+                    
+                    ResultSet stoplistSet=MainFrame.DBconn.createStatement().executeQuery(stopQuery);
+                    System.out.println(stopQuery);
+
+                    while(stoplistSet.next()){
+                        Vector row = new Vector();
+                        System.out.println("name"+stoplistSet.getString("name"));
+                        row.add(n);
+                        row.add(stoplistSet.getString("name"));
+                        row.add(stoplistSet.getLong("mobilenumber"));
+                        row.add(stoplistSet.getString("address"));
+                        row.add(stoplistSet.getInt("Amount"));
+                        row.add(stoplistSet.getString("Remarks"));
+                        if(stoplistSet.getBoolean("Veg")){
+                            numOfVeg++;
+                        }else{
+                            if(stoplistSet.getBoolean("Full")){
+                                numOfNonVegPlate=numOfNonVegPlate+2;
+                            }
+                            else{
+                                numOfNonVegPlate++;
+                            }
+                        }
+                        model.addRow(row);
+                        n++;
+                    }
+                    String restartQuery="SELECT * from customerdetails LEFT JOIN cancel ON (customerdetails.name=cancel.name AND customerdetails.address=cancel.address) WHERE(((cancel.restart AND NOT(cancel.stop)) AND customerdetails."+mealInput+") AND ((NOT cancel."+mealInput+") AND (#"+date+"# <= cancel.fromdate)))";
+                    
+                    ResultSet restartlistSet=MainFrame.DBconn.createStatement().executeQuery(restartQuery);
+                    System.out.println(stopQuery);
+
+                    while(stoplistSet.next()){
+                        Vector row = new Vector();
+                        System.out.println("name"+stoplistSet.getString("name"));
+                        row.add(n);
+                        row.add(stoplistSet.getString("name"));
+                        row.add(stoplistSet.getLong("mobilenumber"));
+                        row.add(stoplistSet.getString("address"));
+                        row.add(stoplistSet.getInt("Amount"));
+                        row.add(stoplistSet.getString("Remarks"));
+                        if(stoplistSet.getBoolean("Veg")){
+                            numOfVeg++;
+                        }else{
+                            if(stoplistSet.getBoolean("Full")){
+                                numOfNonVegPlate=numOfNonVegPlate+2;
+                            }
+                            else{
+                                numOfNonVegPlate++;
+                            }
+                        }
+                        model.addRow(row);
+                        n++;
                     }
                 } catch (SQLException ex) {
                     
                     Logger.getLogger(ListFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-                
-                
-            
-                
- 
-        
-
+               message="For "+dateInput+"  ("+mealInput+") Veg-"+numOfVeg+" Non-Veg-"+numOfNonVegPlate;
+               InfoMessage.setText(message);
     }//GEN-LAST:event_getListActionPerformed
 
     /**
@@ -261,6 +328,7 @@ public class ListFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel InfoMessage;
     private javax.swing.JButton Print;
     private javax.swing.JButton getList;
     private javax.swing.JScrollPane jScrollPane1;
