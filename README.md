@@ -9,5 +9,5 @@ The sample database format is displayed below
 #### Cancel Table Format
 ![Cancel Table Format](/cancel.png)
 #### CancelForInfinte Table Format
-![CancelForInfinte Table Format](/cancelforInfinite.png)
+![CancelForInfinte Table Format](/cancelforInfinte.png)
 
