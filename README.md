@@ -3,3 +3,7 @@
 
 The database used is Ms-Access containing 3 Tables i.e customerdetails,cancel and cancelforinfinte.
 The sample database format is displayed below
+![CustomerDetails Table Format](/CustomerDetails.png)
+![Cancel Table Format](/cancel.png)
+![CancelForInfinte Table Format](/cancelforinfinite.png)
+
