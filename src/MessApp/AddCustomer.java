@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.logging.Level;
@@ -22,17 +23,16 @@ import javax.swing.JOptionPane;
 public class AddCustomer extends javax.swing.JFrame {
     
     PreparedStatement addStmt;
-    //PreparedStatement addToCancel;
-
+    
     /**
      * Creates new form AddCustomer
      */
     public AddCustomer() {
         initComponents();
+        fullRadio.setVisible(false);
+        halfRadio.setVisible(false);
         try {
-            // customerdetails cancel
-            addStmt=MainFrame.DBconn.prepareStatement("insert into  customerdetails(name,amount,address,mobilenumber,breakfast,lunch,dinner,Veg_Nonveg) values(?,?,?,?,?,?,?,?)");
-            //addToCancel=MainFrame.DBconn.prepareStatement("insert into cancel (name,breakfast,lunch,dinner,fromdate,todate,address) values(?,?,?,?,?,?,?)");
+            addStmt=MainFrame.DBconn.prepareStatement("insert into  customerdetails(SerialNumber,name,address,amount,mobilenumber,breakfast,lunch,dinner,Remarks,Veg,Full,StartDate) values(?,?,?,?,?,?,?,?,?,?,?,?)");
         } catch (SQLException ex) {
             System.out.println("ERROER "+ex);
             Logger.getLogger(AddCustomer.class.getName()).log(Level.SEVERE, null, ex);
@@ -50,6 +50,8 @@ public class AddCustomer extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         nameText = new javax.swing.JTextField();
         mobileText = new javax.swing.JTextField();
         amountText = new javax.swing.JTextField();
@@ -62,8 +64,16 @@ public class AddCustomer extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        remarks = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        vegRadio = new javax.swing.JRadioButton();
+        nonVegRadio = new javax.swing.JRadioButton();
+        fullRadio = new javax.swing.JRadioButton();
+        halfRadio = new javax.swing.JRadioButton();
+        serialNumberText = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        vegNonVeg = new javax.swing.JTextField();
+        startDate = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -152,7 +162,39 @@ public class AddCustomer extends javax.swing.JFrame {
 
         jLabel4.setText("Address");
 
-        jLabel5.setText("Veg/Non-Veg");
+        jLabel6.setText("Remarks");
+
+        vegRadio.setText("Veg");
+        vegRadio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                vegRadioActionPerformed(evt);
+            }
+        });
+
+        nonVegRadio.setText("Non-Veg");
+        nonVegRadio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nonVegRadioActionPerformed(evt);
+            }
+        });
+
+        fullRadio.setText("Full");
+        fullRadio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fullRadioActionPerformed(evt);
+            }
+        });
+
+        halfRadio.setText("Half");
+        halfRadio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                halfRadioActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Serial Number");
+
+        jLabel7.setText("Start Date (dd-MM-yyyy)");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -161,30 +203,57 @@ public class AddCustomer extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(nameText, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
-                                .addComponent(mobileText)
-                                .addComponent(amountText)
-                                .addComponent(addressText)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(brfastCheck)
-                                    .addGap(46, 46, 46)
-                                    .addComponent(lunchCheck)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(dinnerCheck)
-                                    .addGap(41, 41, 41))
-                                .addComponent(vegNonVeg, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5)))
+                        .addGap(135, 135, 135)
+                        .addComponent(addCustomer))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(140, 140, 140)
-                        .addComponent(addCustomer)))
+                        .addContainerGap()
+                        .addComponent(vegRadio)
+                        .addGap(18, 18, 18)
+                        .addComponent(nonVegRadio)
+                        .addGap(54, 54, 54)
+                        .addComponent(fullRadio)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nameText, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
+                            .addComponent(mobileText)
+                            .addComponent(amountText)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(remarks, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel6))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(brfastCheck)
+                                        .addGap(42, 42, 42)
+                                        .addComponent(lunchCheck)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(dinnerCheck))
+                                    .addComponent(halfRadio))
+                                .addGap(45, 45, 45)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(addressText, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(serialNumberText, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel5))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(startDate, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel7))
+                                .addGap(25, 25, 25)))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -204,18 +273,32 @@ public class AddCustomer extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addGap(1, 1, 1)
                 .addComponent(addressText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel7))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(serialNumberText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(startDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(brfastCheck)
                     .addComponent(lunchCheck)
                     .addComponent(dinnerCheck))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vegNonVeg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vegRadio)
+                    .addComponent(nonVegRadio)
+                    .addComponent(fullRadio)
+                    .addComponent(halfRadio))
                 .addGap(18, 18, 18)
+                .addComponent(jLabel6)
+                .addGap(18, 18, 18)
+                .addComponent(remarks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(addCustomer)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -223,35 +306,39 @@ public class AddCustomer extends javax.swing.JFrame {
 
     private void addCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addCustomerActionPerformed
         try {
+            
             // TODO add your handling code here:
             String name=nameText.getText();
             String mobileNumber=mobileText.getText();
             String amount=amountText.getText();
             String address=addressText.getText();
-            String vegNonVegText=vegNonVeg.getText();
+            String remarksText=remarks.getText();
+            String dateString=startDate.getText();
+            java.sql.Timestamp dateTime=null;
+            SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
+            try { 
+                 java.util.Date date= sdf1.parse(dateString);
+                 dateTime=new java.sql.Timestamp(date.getTime());
+            } catch (ParseException ex) {
+                Logger.getLogger(AddCustomer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
             boolean bfast=brfastCheck.isSelected();
             boolean lunch=lunchCheck.isSelected();
             boolean dinner=dinnerCheck.isSelected();
-            addStmt.setString(1,name);
-            addStmt.setString(4,mobileNumber);
-            addStmt.setInt(2,Integer.parseInt(amount));
+            addStmt.setLong(1,new Long(serialNumberText.getText()));
+            addStmt.setString(2,name);
+            addStmt.setString(5,mobileNumber);
+            addStmt.setInt(4,Integer.parseInt(amount));
             addStmt.setString(3, address);
-            addStmt.setBoolean(5, bfast);
-            addStmt.setBoolean(6, lunch);
-            addStmt.setBoolean(7, dinner);
-            addStmt.setString(8,vegNonVegText);
+            addStmt.setBoolean(6, bfast);
+            addStmt.setBoolean(7, lunch);
+            addStmt.setBoolean(8, dinner);
+            addStmt.setString(9,remarksText);
+            addStmt.setBoolean(10,vegRadio.isSelected());
+            addStmt.setBoolean(11,fullRadio.isSelected());
+            addStmt.setTimestamp(12,dateTime);
             addStmt.execute();
-//            addToCancel.setString(1, name);
-//            addToCancel.setBoolean(2, false);
-//            addToCancel.setBoolean(3, false);
-//            addToCancel.setBoolean(4, false);
-            DateFormat format=new SimpleDateFormat("dd-MM-yyyy");
-                Calendar cal=Calendar.getInstance();
-                java.sql.Date dateInput=new java.sql.Date(cal.getTime().getTime());
-//            addToCancel.setDate(5,dateInput);
-//            addToCancel.setDate(6, dateInput);
-//            addToCancel.setString(7,address);
-//            addToCancel.execute();
             JOptionPane.showConfirmDialog(rootPane, "Successfully Added","Information",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException ex) {
             Logger.getLogger(AddCustomer.class.getName()).log(Level.SEVERE, null, ex);
@@ -297,6 +384,30 @@ public class AddCustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_mobileTextMouseClicked
 
+    private void vegRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vegRadioActionPerformed
+        // TODO add your handling code here:
+        nonVegRadio.setSelected(false);
+        fullRadio.setVisible(false);
+        halfRadio.setVisible(false);
+    }//GEN-LAST:event_vegRadioActionPerformed
+
+    private void nonVegRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nonVegRadioActionPerformed
+        // TODO add your handling code here:
+        vegRadio.setSelected(false);
+        fullRadio.setVisible(true);
+        halfRadio.setVisible(true);
+    }//GEN-LAST:event_nonVegRadioActionPerformed
+
+    private void fullRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fullRadioActionPerformed
+        // TODO add your handling code here:
+        halfRadio.setSelected(false);
+    }//GEN-LAST:event_fullRadioActionPerformed
+
+    private void halfRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_halfRadioActionPerformed
+        // TODO add your handling code here:
+        fullRadio.setSelected(false);
+    }//GEN-LAST:event_halfRadioActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -337,16 +448,26 @@ public class AddCustomer extends javax.swing.JFrame {
     private javax.swing.JTextField addressText;
     private javax.swing.JTextField amountText;
     private javax.swing.JCheckBox brfastCheck;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JCheckBox dinnerCheck;
+    private javax.swing.JRadioButton fullRadio;
+    private javax.swing.JRadioButton halfRadio;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JCheckBox lunchCheck;
     private javax.swing.JTextField mobileText;
     private javax.swing.JTextField nameText;
-    private javax.swing.JTextField vegNonVeg;
+    private javax.swing.JRadioButton nonVegRadio;
+    private javax.swing.JTextField remarks;
+    private javax.swing.JTextField serialNumberText;
+    private javax.swing.JTextField startDate;
+    private javax.swing.JRadioButton vegRadio;
     // End of variables declaration//GEN-END:variables
 }
